@@ -39,7 +39,7 @@ You may copy this file to your /usr/local/bin  if you like:
 
     sudo cp pngtotxt/usr/local/bin/
 
-###LANGUAGE SUPPORT
+### LANGUAGE SUPPORT
 
 In order to be able to convert images of text in specific languages :
 
@@ -52,7 +52,7 @@ In order to be able to convert images of text in specific languages :
 
     $ pngtotxt
 
-###HOW TO USE IT
+### HOW TO USE IT
 
 Gather all the numbered images that you wish to convert at your desktop. 
 
