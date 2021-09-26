@@ -1,0 +1,135 @@
+#! /bin/bash
+#                            _               _            _   
+#  _ __    _ __     __ _    | |_    ___     | |_  __  __ | |_ 
+# | '_ \  | '_ \   / _` |   | __|  / _ \    | __| \ \/ / | __|
+# | |_) | | | | | | (_| |   | |_  | (_) |   | |_   >  <  | |_ 
+# | .__/  |_| |_|  \__, |    \__|  \___/     \__| /_/\_\  \__|
+# |_|              |___/      
+#Convert many images of text to one concatenated text file
+#Written by Christos Angelopoulos, September 2021
+
+cd ~/Desktop
+zenity --info --title="png to txt Converter" --height=40 --width=600 --text='Gather all the numbered images that you wish to convert at your desktop.
+<span foreground="yellow"><b><u>CAUTION</u></b></span>: Remove all other irrelevant images from the desktop directory.
+Images can be either <b>png or gif</b>.
+<b>Good luck\!</b>'
+case $? in 
+ 0)  
+ ;; 
+ 1)  exit
+ ;; 
+esac
+#renaming 
+rename 's/gif/png' *.gif 
+ n=1
+FINALTEXTLOOP=1
+PAGE=$(ls ~/Desktop/*.png| wc -l)
+#how many digits in number of files $PAGE
+Z0=${#PAGE}
+DIRECTORY=$(zenity --entry --height=40 --width=600 --title="png to txt Converter" --text="PNG TO TXT CONVERTER
+ You want to convert "$PAGE" images in one text.
+  These images will be arithmetically renamed.
+  How do you wish to name the final text;")
+case $? in 
+ 0)  
+ ;; 
+ 1)  exit
+ ;; 
+esac
+if [ -z "$DIRECTORY" ]
+then
+  exit
+fi
+echo "$DIRECTORY"
+mkdir -p "$DIRECTORY"/png 
+mv *.png ~/Desktop/"$DIRECTORY"
+cd "$DIRECTORY" 
+LANGUAGE=$(zenity --list \
+    --height=200 \
+    --width=600 \
+    --radiolist \
+    --title="png to txt Converter" \
+    --text="Select text language:" \
+    --column="Select" \
+    --column="Code" \
+    --column="Language" \
+    True eng English  \
+    False el Greek \
+    False spa Spanish \
+    False grc Ancient\ Greek \
+    False ita Italian \
+    False fra Francais \
+    False dan Danish \
+    False deu German \
+    False fra Francais \
+    False por Portuguese \
+    --multiple \
+    --print-column=2 \
+    --separator=^ )
+case $? in 
+  0)  
+  ;; 
+  1)  exit
+  ;; 
+esac
+#get rid of spaces in .png names so that they can be renamed
+for SPACEGONE in {1..6};do rename 's/ //' *.png;done
+FILES=$(ls ~/Desktop/"$DIRECTORY"/*.png|wc -l)
+ls  *.png|sort -h>files.texto
+Z0=${#FILES}
+#echo "files "$FILES
+#echo "digits "$Z0
+mkdir ~/Desktop/"$DIRECTORY"/temp/
+i=1
+while [ $i -le $FILES ]
+do
+		file=$(head -$i files.texto|tail +$i)
+		#echo "file " $file
+  NEWNUMBER="$(printf "%."$Z0"d" $i)"
+  #echo "temp "$NEWNUMBER".png"
+  #echo "i- "$i
+  #echo =============
+  mv $file ~/Desktop/"$DIRECTORY"/temp/$NEWNUMBER.png
+  ((i++))
+ done
+ mv ~/Desktop/"$DIRECTORY"/temp/*.png ~/Desktop/"$DIRECTORY"/
+ rm  -r ~/Desktop/"$DIRECTORY"/temp/ files.texto
+####translating
+LL=0
+(
+while [ $LL -le $PAGE ]
+do
+  NEWNUMBER=$(printf "%."$Z0"d" $LL)
+  tesseract -l $LANGUAGE $NEWNUMBER.png $NEWNUMBER
+  LL100=$(( $LL * 100 ))
+  PERCENTAGE=$(( $LL100 / $PAGE))
+  echo "# Converting image $LL of $PAGE  ($PERCENTAGE%)"
+  echo "$PERCENTAGE"
+  ((LL++))
+done
+) |
+ zenity --progress --height=40 --width=600 \
+  --title="Convert PNG to TXT " \
+  --text="Preparing to convert..." \
+  --percentage=0 \
+  --auto-close
+    case $? in 
+     0)  
+     ;; 
+     1)  exit
+     ;; 
+    esac
+#concatenating all txt files to one file
+cat ~/Desktop/"$DIRECTORY"/*.txt>>~/Desktop/"$DIRECTORY"/"$DIRECTORY".text
+#move all txt files to txt file
+mkdir ~/Desktop/"$DIRECTORY"/txt && mv ~/Desktop/"$DIRECTORY"/*.txt ~/Desktop/"$DIRECTORY"/txt
+#rename final text
+mv ~/Desktop/"$DIRECTORY"/"$DIRECTORY".text ~/Desktop/"$DIRECTORY"/"$DIRECTORY".txt
+#get rid of special character 
+sed -i 's///g' ~/Desktop/"$DIRECTORY"/"$DIRECTORY".txt
+#move all png images to png file
+mv ~/Desktop/"$DIRECTORY"/*.png ~/Desktop/"$DIRECTORY"/png
+#create scroll png
+convert -append ~/Desktop/"$DIRECTORY"/png/*.png ~/Desktop/"$DIRECTORY"/"$DIRECTORY"_scroll.png
+zenity --info --height=40 --width=600 --title="png to txt Converter" --text="Conversion of ""$DIRECTORY"" has completed succesfully!" 
+
