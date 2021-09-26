@@ -62,24 +62,24 @@ Images can be either png or gif.
 
 Run pngtotxt, and you will be welcome with this message:
 
-![image 1](screenshot1.png)
+![image 1](screenshots/screenshot1.png)
 
 After you press _Enter_, you will be asked to give the name you wish for the final text:
 
 
-![image 2](screenshot2.png)
+![image 2](screenshots/screenshot2.png)
 
 After naming the final text, you will be asked for the language of the text:
 
-![image 3](screenshot3.png)
+![image 3](screenshots/screenshot3.png)
 
 After language selection, the conversion commences:
 
-![image 4](screenshot4.png)
+![image 4](screenshots/screenshot4.png)
 
 Finally, you get a message when the conversion is complete:
 
-![image 5](screenshot5.png)
+![image 5](screenshots/screenshot5.png)
 
 In the desktop you will find a folder named  by the text name, that will contain:
 
